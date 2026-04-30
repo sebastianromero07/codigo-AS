@@ -280,3 +280,52 @@ Para completar el diseño, se debería definir un componente de almacenamiento p
   - `PENDING_PAYMENT`: la factura está fondeada y se espera el pago en la fecha de vencimiento.
   - `OVERDUE / IN_MORA`: pasó la fecha estimada y el pagador no ha pagado.
   - `DEFAULTED`: impago confirmado, se dispara el proceso de protesto/cobranza.
+
+
+
+### No se especifica claramente a quién se está pagando
+
+El diagrama muestra servicios de pago, pero no indica claramente quién recibe el dinero.
+
+Según el caso de uso:
+
+```txt
+Seller Payout Service   → Entity C paga a Company A
+Investor Payout Service → Entity C paga a Investor D
+Invoice Pay             → Company B paga a Entity C
+```
+
+### Los pagos parecen ejecutarse al mismo tiempo
+
+El diagrama puede dar la impresión de que el pago al cedente y el pago al inversionista ocurren en paralelo.
+
+Sin embargo, en el caso de uso factoring, los pagos deben ocurrir en momentos diferentes.
+
+El flujo correcto debería ser:
+
+```txt
+1. Investor D compra la factura.
+2. Entity C paga a Company A un monto menor para darle liquidez.
+3. Company B paga la factura a Entity C.
+4. Entity C paga a Investor D el capital invertido más la ganancia.
+```
+
+---
+
+### Falta representar qué ocurre si Company B no paga
+
+El diagrama no muestra un flujo alternativo para los casos en los que el pagador no cumple con el pago de la factura.
+
+Se debería contemplar un flujo para:
+
+```txt
+- Retraso en el pago
+- Mora
+- Impago
+- Cobranza
+- Protesto o recuperación
+```
+
+
+
+
