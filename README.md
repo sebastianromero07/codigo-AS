@@ -263,15 +263,11 @@ Docker
 
 ## Observaciones de Arquitectura
 
-### Almacenamiento de Facturas
-
 En el diagrama actual, el `Invoice Upload Service` recibe la factura enviada por la empresa. Sin embargo, no se especifica dónde se almacena el archivo de la factura.
 
 El componente `Invoice state cache` no debe interpretarse como almacenamiento principal de la factura, ya que solo representa el estado de la factura, por ejemplo: subida, validada, publicada o pendiente de pago.
 
 Para completar el diseño, se debería definir un componente de almacenamiento para el archivo de la factura y otro para la metadata.
-
-### Validación, flujo de pago y estados
 
 - **Falta un servicio de validación de la Empresa A (cedente).** Antes de aceptar cualquier factura, debe existir un paso que valide la identidad y legitimidad de la empresa que la sube (RUC activo, no estar en listas restrictivas).
 - **Falta el `Invoice Validation Service` antes del `Invoice Upload`.** La factura se publica antes de validarse. El orden correcto es: subir → validar (SUNAT, formato, no anulada) → recién entonces publicar.
