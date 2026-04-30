@@ -270,3 +270,17 @@ En el diagrama actual, el `Invoice Upload Service` recibe la factura enviada por
 El componente `Invoice state cache` no debe interpretarse como almacenamiento principal de la factura, ya que solo representa el estado de la factura, por ejemplo: subida, validada, publicada o pendiente de pago.
 
 Para completar el diseño, se debería definir un componente de almacenamiento para el archivo de la factura y otro para la metadata.
+
+### Validación, flujo de pago y estados
+
+- **Falta un servicio de validación de la Empresa A (cedente).** Antes de aceptar cualquier factura, debe existir un paso que valide la identidad y legitimidad de la empresa que la sube (RUC activo, no estar en listas restrictivas).
+- **Falta el `Invoice Validation Service` antes del `Invoice Upload`.** La factura se publica antes de validarse. El orden correcto es: subir → validar (SUNAT, formato, no anulada) → recién entonces publicar.
+- **El `Invoice state cache` está de más.** No es una cache real, es simplemente el estado actual de la factura (columna `status` en la tabla `invoices`). Agregarlo como bloque en el flujo confunde y sugiere infraestructura innecesaria.
+- **El flujo de `Invoice Pay` está invertido.** Se reparte a inversionistas antes de confirmar el cobro. El orden correcto es:
+  1. La Entidad A (pagador) realiza el pago.
+  2. El sistema confirma que el dinero ingresó al banco.
+  3. Recién entonces se ejecuta el payout al inversor (capital + ganancia) y al cedente si corresponde.
+- **Faltan estados de pago pendiente, impago y mora.** El flujo actual asume el camino feliz. Se debe contemplar:
+  - `PENDING_PAYMENT`: la factura está fondeada y se espera el pago en la fecha de vencimiento.
+  - `OVERDUE / IN_MORA`: pasó la fecha estimada y el pagador no ha pagado.
+  - `DEFAULTED`: impago confirmado, se dispara el proceso de protesto/cobranza.
