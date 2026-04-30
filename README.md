@@ -1,10 +1,11 @@
-# codigo-AS
+## Project Structure
 
-
+```txt
 factoring-platform-api/
 │
 ├── app/
 │   ├── main.py
+│   │
 │   ├── api/
 │   │   ├── deps.py
 │   │   └── v1/
@@ -180,3 +181,82 @@ factoring-platform-api/
 ├── pyproject.toml
 ├── README.md
 └── requirements.txt
+```
+
+## Main Modules
+
+| Module | Responsibility |
+|---|---|
+| `auth` | User login, authentication, JWT tokens and permissions. |
+| `users` | User management for companies, investors and admins. |
+| `companies` | Company/entity information and fiscal data. |
+| `invoices` | Invoice upload, invoice data and invoice lifecycle states. |
+| `invoice_validation` | Invoice validation, duplicate checks and SUNAT validation. |
+| `risk` | Entity risk scoring and risk evaluation. |
+| `pricing` | Price, profit and liquid amount calculation. |
+| `marketplace` | Invoice publication and marketplace listing. |
+| `investments` | Investor purchase flow and investment lifecycle. |
+| `payouts` | Seller and investor payout management. |
+| `payments` | Payment processing with external bank provider. |
+| `notifications` | Email, push or system notifications. |
+
+## Architecture Style
+
+This project follows a modular monolith architecture using FastAPI.
+
+Each business module is organized using the following structure:
+
+```txt
+module_name/
+├── models.py
+├── schemas.py
+├── repository.py
+├── service.py
+└── exceptions.py
+```
+
+### File Responsibility
+
+| File | Purpose |
+|---|---|
+| `models.py` | SQLAlchemy database models. |
+| `schemas.py` | Pydantic request and response schemas. |
+| `repository.py` | Database access logic. |
+| `service.py` | Business rules and use cases. |
+| `exceptions.py` | Module-specific exceptions. |
+| `states.py` | State definitions for invoices or investments. |
+
+## Main Business Flow
+
+```txt
+Company uploads invoice
+        ↓
+Invoice is validated
+        ↓
+SUNAT validation is executed
+        ↓
+Risk score is calculated
+        ↓
+Price and profit are calculated
+        ↓
+Invoice is published in marketplace
+        ↓
+Investor buys invoice
+        ↓
+Seller receives payout
+        ↓
+Investor receives payout after collection
+```
+
+## Suggested Tech Stack
+
+```txt
+FastAPI
+PostgreSQL
+SQLAlchemy
+Alembic
+Redis
+JWT
+Pytest
+Docker
+```
