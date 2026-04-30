@@ -260,3 +260,13 @@ JWT
 Pytest
 Docker
 ```
+
+## Observaciones de Arquitectura
+
+### Almacenamiento de Facturas
+
+En el diagrama actual, el `Invoice Upload Service` recibe la factura enviada por la empresa. Sin embargo, no se especifica dónde se almacena el archivo de la factura.
+
+El componente `Invoice state cache` no debe interpretarse como almacenamiento principal de la factura, ya que solo representa el estado de la factura, por ejemplo: subida, validada, publicada o pendiente de pago.
+
+Para completar el diseño, se debería definir un componente de almacenamiento para el archivo de la factura y otro para la metadata.
