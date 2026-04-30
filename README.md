@@ -1,1 +1,182 @@
 # codigo-AS
+
+
+factoring-platform-api/
+│
+├── app/
+│   ├── main.py
+│   ├── api/
+│   │   ├── deps.py
+│   │   └── v1/
+│   │       ├── router.py
+│   │       └── endpoints/
+│   │           ├── auth_routes.py
+│   │           ├── invoice_routes.py
+│   │           ├── invoice_validation_routes.py
+│   │           ├── marketplace_routes.py
+│   │           ├── investment_routes.py
+│   │           ├── payout_routes.py
+│   │           ├── risk_routes.py
+│   │           └── notification_routes.py
+│   │
+│   ├── core/
+│   │   ├── config.py
+│   │   ├── security.py
+│   │   ├── exceptions.py
+│   │   ├── logging.py
+│   │   └── constants.py
+│   │
+│   ├── db/
+│   │   ├── base.py
+│   │   ├── session.py
+│   │   └── migrations/
+│   │
+│   ├── modules/
+│   │   ├── auth/
+│   │   │   ├── models.py
+│   │   │   ├── schemas.py
+│   │   │   ├── repository.py
+│   │   │   ├── service.py
+│   │   │   └── exceptions.py
+│   │   │
+│   │   ├── users/
+│   │   │   ├── models.py
+│   │   │   ├── schemas.py
+│   │   │   ├── repository.py
+│   │   │   └── service.py
+│   │   │
+│   │   ├── companies/
+│   │   │   ├── models.py
+│   │   │   ├── schemas.py
+│   │   │   ├── repository.py
+│   │   │   └── service.py
+│   │   │
+│   │   ├── invoices/
+│   │   │   ├── models.py
+│   │   │   ├── schemas.py
+│   │   │   ├── repository.py
+│   │   │   ├── service.py
+│   │   │   ├── states.py
+│   │   │   └── exceptions.py
+│   │   │
+│   │   ├── invoice_validation/
+│   │   │   ├── schemas.py
+│   │   │   ├── service.py
+│   │   │   ├── validators.py
+│   │   │   └── exceptions.py
+│   │   │
+│   │   ├── risk/
+│   │   │   ├── models.py
+│   │   │   ├── schemas.py
+│   │   │   ├── repository.py
+│   │   │   ├── service.py
+│   │   │   └── score_calculator.py
+│   │   │
+│   │   ├── pricing/
+│   │   │   ├── schemas.py
+│   │   │   ├── service.py
+│   │   │   └── price_calculator.py
+│   │   │
+│   │   ├── marketplace/
+│   │   │   ├── models.py
+│   │   │   ├── schemas.py
+│   │   │   ├── repository.py
+│   │   │   └── service.py
+│   │   │
+│   │   ├── investments/
+│   │   │   ├── models.py
+│   │   │   ├── schemas.py
+│   │   │   ├── repository.py
+│   │   │   ├── service.py
+│   │   │   └── states.py
+│   │   │
+│   │   ├── payouts/
+│   │   │   ├── models.py
+│   │   │   ├── schemas.py
+│   │   │   ├── repository.py
+│   │   │   ├── service.py
+│   │   │   └── exceptions.py
+│   │   │
+│   │   ├── payments/
+│   │   │   ├── schemas.py
+│   │   │   ├── service.py
+│   │   │   └── payment_provider.py
+│   │   │
+│   │   └── notifications/
+│   │       ├── schemas.py
+│   │       ├── service.py
+│   │       └── templates.py
+│   │
+│   ├── integrations/
+│   │   ├── sunat/
+│   │   │   ├── client.py
+│   │   │   ├── schemas.py
+│   │   │   └── exceptions.py
+│   │   │
+│   │   ├── bank/
+│   │   │   ├── client.py
+│   │   │   ├── schemas.py
+│   │   │   └── exceptions.py
+│   │   │
+│   │   └── email/
+│   │       ├── client.py
+│   │       └── schemas.py
+│   │
+│   ├── infrastructure/
+│   │   ├── cache/
+│   │   │   ├── redis.py
+│   │   │   └── keys.py
+│   │   │
+│   │   ├── storage/
+│   │   │   ├── local_storage.py
+│   │   │   └── s3_storage.py
+│   │   │
+│   │   └── queue/
+│   │       ├── publisher.py
+│   │       └── consumer.py
+│   │
+│   ├── jobs/
+│   │   ├── invoice_expiration_job.py
+│   │   ├── payout_reconciliation_job.py
+│   │   └── notification_job.py
+│   │
+│   └── shared/
+│       ├── enums.py
+│       ├── pagination.py
+│       ├── responses.py
+│       ├── utils.py
+│       └── date_utils.py
+│
+├── tests/
+│   ├── conftest.py
+│   ├── test_auth.py
+│   ├── test_invoices.py
+│   ├── test_invoice_validation.py
+│   ├── test_marketplace.py
+│   ├── test_investments.py
+│   ├── test_payouts.py
+│   └── test_risk.py
+│
+├── alembic/
+│   ├── versions/
+│   └── env.py
+│
+├── scripts/
+│   ├── create_superuser.py
+│   ├── seed_data.py
+│   └── run_dev.py
+│
+├── docs/
+│   ├── architecture.md
+│   ├── api_flows.md
+│   └── business_rules.md
+│
+├── .env
+├── .env.example
+├── .gitignore
+├── alembic.ini
+├── docker-compose.yml
+├── Dockerfile
+├── pyproject.toml
+├── README.md
+└── requirements.txt
