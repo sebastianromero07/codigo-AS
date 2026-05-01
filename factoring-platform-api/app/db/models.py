@@ -1,7 +1,7 @@
+import enum
 from datetime import date, datetime
 from decimal import Decimal
-
-from sqlalchemy import Date, DateTime, ForeignKey, Integer, Numeric, String
+from sqlalchemy import Column, Date, DateTime, ForeignKey, Integer, Numeric, String, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.session import Base
@@ -73,3 +73,13 @@ class Transaction(Base):
     )
 
     wallet: Mapped["Wallet"] = relationship(back_populates="transactions")
+class UserType(str, enum.Enum):
+    ENTITY = "entity"
+    INVESTOR = "investor"
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, unique=True, index=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+    user_type = Column(String, default=UserType.INVESTOR) # 'entity' o 'investor'
