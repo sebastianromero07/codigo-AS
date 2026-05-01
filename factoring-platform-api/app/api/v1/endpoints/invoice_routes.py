@@ -31,7 +31,25 @@ REQUIRED_TAGS = (
 
 
 class InvoiceResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "id": 1,
+                "company_id": 1,
+                "ruc_emisor": "20123456789",
+                "serie": "F001",
+                "numero": "123",
+                "monto": "1500.00",
+                "moneda": "PEN",
+                "fecha_emision": "2026-04-01",
+                "fecha_vencimiento": "2026-05-01",
+                "file_path": "uploads/1/9f3a2b1c4e5d4a6b8c7d.xml",
+                "status": "uploaded",
+                "created_at": "2026-05-01T10:00:00",
+            }
+        },
+    )
 
     id: int
     company_id: int

@@ -14,12 +14,28 @@ router = APIRouter(prefix="/payments", tags=["payments"])
 
 
 class WalletFundRequest(BaseModel):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {"user_id": 10, "amount": "5000.00"}
+        }
+    )
+
     user_id: int
     amount: Decimal = Field(..., gt=0)
 
 
 class WalletResponse(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "id": 1,
+                "user_id": 10,
+                "user_type": "investor",
+                "balance": "5000.00",
+            }
+        },
+    )
 
     id: int
     user_id: int
@@ -28,6 +44,18 @@ class WalletResponse(BaseModel):
 
 
 class InvoicePurchaseRequest(BaseModel):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "user_id": 10,
+                "user_type": "investor",
+                "company_id": 1,
+                "invoice_id": 1,
+                "amount": "1500.00",
+            }
+        }
+    )
+
     user_id: int
     user_type: str = Field(..., description="Debe ser 'investor'")
     company_id: int
@@ -36,6 +64,17 @@ class InvoicePurchaseRequest(BaseModel):
 
 
 class PurchaseResponse(BaseModel):
+    model_config = ConfigDict(
+        json_schema_extra={
+            "example": {
+                "success": True,
+                "message": "Factura comprada exitosamente. Fondos transferidos a la empresa.",
+                "transaction_id": 1,
+                "remaining_balance": "3500.00",
+            }
+        }
+    )
+
     success: bool
     message: str
     transaction_id: Optional[int] = None
