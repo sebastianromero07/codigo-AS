@@ -2,7 +2,7 @@ from fastapi import APIRouter
 
 router = APIRouter()
 
-# Simulación de base de datos (puedes reemplazarla)
+# Simulación de base de datos 
 fake_db = {
     1: {"id": 1, "amount": 1000, "state": "DRAFT"}
 }
