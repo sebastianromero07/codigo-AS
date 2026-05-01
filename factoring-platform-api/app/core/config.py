@@ -1,4 +1,5 @@
 from functools import lru_cache
+
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -8,14 +9,11 @@ class Settings(BaseSettings):
     app_env: str = Field(default="development", alias="APP_ENV")
     api_v1_prefix: str = Field(default="/api/v1", alias="API_V1_PREFIX")
 
-    h2_driver: str = Field(default="org.h2.Driver", alias="H2_DRIVER")
-    h2_jdbc_url: str = Field(
-        default="jdbc:h2:tcp://localhost:9092/./factoring_platform",
-        alias="H2_JDBC_URL",
+    database_url: str = Field(
+        default="postgresql+psycopg2://factoring:factoring@localhost:5432/factoring_platform",
+        alias="DATABASE_URL",
     )
-    h2_user: str = Field(default="sa", alias="H2_USER")
-    h2_password: str = Field(default="", alias="H2_PASSWORD")
-    h2_jar_path: str = Field(default="drivers/h2.jar", alias="H2_JAR_PATH")
+    db_echo: bool = Field(default=False, alias="DB_ECHO")
 
     model_config = SettingsConfigDict(
         env_file=".env",

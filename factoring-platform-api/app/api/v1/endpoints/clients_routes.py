@@ -1,9 +1,13 @@
-from typing import Any
+from datetime import datetime
 
-from fastapi import APIRouter, HTTPException, status
-from pydantic import BaseModel, EmailStr, Field
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, ConfigDict, EmailStr, Field
+from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
+from sqlalchemy.orm import Session
 
-from app.db.h2 import H2ConnectionError, execute_query, execute_update, init_database
+from app.db.models import Client
+from app.db.session import get_db
 
 router = APIRouter(prefix="/clients", tags=["clients"])
 
@@ -15,70 +19,36 @@ class ClientCreate(BaseModel):
 
 
 class ClientResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     document_number: str
     business_name: str
     email: str
-    created_at: str | None = None
-
-
-def _normalize_client(row: dict[str, Any]) -> dict[str, Any]:
-    return {
-        "id": row.get("id"),
-        "document_number": row.get("document_number"),
-        "business_name": row.get("business_name"),
-        "email": row.get("email"),
-        "created_at": str(row.get("created_at")) if row.get("created_at") is not None else None,
-    }
+    created_at: datetime
 
 
 @router.get("", response_model=list[ClientResponse])
-def list_clients():
-    try:
-        init_database()
-
-        rows = execute_query(
-            """
-            SELECT id, document_number, business_name, email, created_at
-            FROM clients
-            ORDER BY id DESC
-            """
-        )
-
-        return [_normalize_client(row) for row in rows]
-    except H2ConnectionError as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
+def list_clients(db: Session = Depends(get_db)):
+    rows = db.execute(select(Client).order_by(Client.id.desc())).scalars().all()
+    return rows
 
 
 @router.post("", response_model=ClientResponse, status_code=status.HTTP_201_CREATED)
-def create_client(payload: ClientCreate):
+def create_client(payload: ClientCreate, db: Session = Depends(get_db)):
+    client = Client(
+        document_number=payload.document_number,
+        business_name=payload.business_name,
+        email=payload.email,
+    )
+    db.add(client)
     try:
-        init_database()
-
-        execute_update(
-            """
-            INSERT INTO clients (document_number, business_name, email)
-            VALUES (?, ?, ?)
-            """,
-            [payload.document_number, payload.business_name, payload.email],
-        )
-
-        rows = execute_query(
-            """
-            SELECT id, document_number, business_name, email, created_at
-            FROM clients
-            WHERE email = ?
-            """,
-            [payload.email],
-        )
-
-        return _normalize_client(rows[0])
-
-    except H2ConnectionError as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
-
-    except Exception as exc:
+        db.commit()
+    except IntegrityError:
+        db.rollback()
         raise HTTPException(
-            status_code=400,
-            detail="No se pudo crear el cliente. Revisa si el RUC/documento o email ya existen.",
-        ) from exc
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El documento o email ya existen.",
+        )
+    db.refresh(client)
+    return client

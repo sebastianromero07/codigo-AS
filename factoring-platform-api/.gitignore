@@ -3,12 +3,7 @@ __pycache__/
 *.pyc
 .env
 
-# H2 local database files
-data/h2/*.mv.db
-data/h2/*.trace.db
-
-# JDBC driver downloaded locally
-drivers/h2.jar
-
+uploads/
 .DS_Store
 .pytest_cache/
+*.db
