@@ -10,7 +10,8 @@ from pydantic import BaseModel, ConfigDict
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.db.models import Invoice
+from app.api.deps import get_current_user
+from app.db.models import Invoice, User
 from app.db.session import get_db
 
 router = APIRouter(prefix="/invoices", tags=["invoices"])
@@ -176,13 +177,20 @@ def _write_xml_to_disk(content: bytes, company_id: int) -> str:
 
 
 @router.get("", response_model=list[InvoiceResponse])
-def list_invoices(db: Session = Depends(get_db)):
+def list_invoices(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
     return db.execute(select(Invoice).order_by(Invoice.id.desc())).scalars().all()
 
 
 @router.post("", response_model=InvoiceResponse, status_code=status.HTTP_201_CREATED)
-def upload_invoice(file: UploadFile = File(...), db: Session = Depends(get_db)):
-    company_id = 1  # TODO: sacar de get_current_user cuando auth esté listo
+def upload_invoice(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    company_id = current_user.id
 
     content = _read_xml_payload(file)
     parsed = _parse_invoice_xml(content)
