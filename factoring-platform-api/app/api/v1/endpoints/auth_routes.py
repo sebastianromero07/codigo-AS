@@ -45,5 +45,3 @@ def login_acceso_rapido(form_data: OAuth2PasswordRequestForm = Depends()):
     raise HTTPException(status_code=400, detail="Credenciales incorrectas")
 
 
-
-
