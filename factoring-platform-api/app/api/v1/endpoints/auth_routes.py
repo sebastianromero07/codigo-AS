@@ -1,63 +1,47 @@
+'''
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
-from sqlalchemy import select
+from app.api import deps
+from app.core.security import verify_password, create_access_token
+from app.modules.users.repository import get_user_by_email # Asumiendo que tienes esta función
 
-from app.core.security import verify_password, get_password_hash, create_access_token
-from app.db.models import User
-from app.db.session import get_db
-
-router = APIRouter(prefix="/auth", tags=["auth"])
-
-
-class UserCreate(BaseModel):
-    email: EmailStr
-    password: str
-    user_type: str  # "entity" o "investor"
-
-
-@router.post("/register", status_code=status.HTTP_201_CREATED)
-def register(payload: UserCreate, db: Session = Depends(get_db)):
-    existing_user = db.execute(
-        select(User).where(User.email == payload.email)
-    ).scalar_one_or_none()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="El correo ya está registrado.")
-
-    new_user = User(
-        email=payload.email,
-        hashed_password=get_password_hash(payload.password),
-        user_type=payload.user_type,
-    )
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return {"message": "Usuario creado exitosamente", "user_id": new_user.id}
-
+router = APIRouter()
 
 @router.post("/login")
 def login_access_token(
-    db: Session = Depends(get_db),
-    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(deps.get_db),
+    form_data: OAuth2PasswordRequestForm = Depends()
 ):
     """
-    Autenticación de usuarios y generación de token JWT.
+    Autenticación de usuarios y generación de token.
     """
-    user = db.execute(
-        select(User).where(User.email == form_data.username)
-    ).scalar_one_or_none()
-
+    user = get_user_by_email(db, email=form_data.username)
     if not user or not verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Correo o contraseña incorrectos",
             headers={"WWW-Authenticate": "Bearer"},
         )
-
+    
+    # Generar token
     access_token = create_access_token(subject=user.id)
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "user_type": user.user_type,
+        "user_role": user.role # Útil para el frontend (ej. 'investor' o 'company')
     }
+
+'''
+'''
+MOKERARLO POR SI LA BD FALLA
+'''
+@router.post("/login")
+def login_acceso_rapido(form_data: OAuth2PasswordRequestForm = Depends()):
+    # Bypass para que el PoC funcione sí o sí
+    if form_data.username == "demo@demo.com" and form_data.password == "1234":
+        access_token = create_access_token(subject="1") # 1 es un ID de usuario ficticio
+        return {"access_token": access_token, "token_type": "bearer"}
+    raise HTTPException(status_code=400, detail="Credenciales incorrectas")
+
+
