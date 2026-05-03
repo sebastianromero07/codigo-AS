@@ -267,21 +267,24 @@ En el diagrama actual, el `Invoice Upload Service` recibe la factura enviada por
 
 El componente `Invoice state cache` no debe interpretarse como almacenamiento principal de la factura, ya que solo representa el estado de la factura, por ejemplo: subida, validada, publicada o pendiente de pago.
 
-Para completar el diseño, se debería definir un componente de almacenamiento para el archivo de la factura y otro para la metadata.
+Para completar el diseño, se debería definir un componente de almacenamiento para el archivo de la factura y otro para la metadata,por ejemplo un almacenamiento de objetos separado de la base de datos relacional. 
+
 
 - **Falta un servicio de validación de la Empresa A (cedente).** Antes de aceptar cualquier factura, debe existir un paso que valide la identidad y legitimidad de la empresa que la sube (RUC activo, no estar en listas restrictivas).
 - **Falta el `Invoice Validation Service` antes del `Invoice Upload`.** La factura se publica antes de validarse. El orden correcto es: subir → validar (SUNAT, formato, no anulada) → recién entonces publicar.
 - **El `Invoice state cache` está de más.** No es una cache real, es simplemente el estado actual de la factura (columna `status` en la tabla `invoices`). Agregarlo como bloque en el flujo confunde y sugiere infraestructura innecesaria.
 - **El flujo de `Invoice Pay` está invertido.** Se reparte a inversionistas antes de confirmar el cobro. El orden correcto es:
-  1. La Entidad A (pagador) realiza el pago.
+  1. La Entidad B (pagador) realiza el pago.
   2. El sistema confirma que el dinero ingresó al banco.
   3. Recién entonces se ejecuta el payout al inversor (capital + ganancia) y al cedente si corresponde.
+En este punto, se observa que no se está representando claramente el ingreso de dinero desde la Entidad B, lo cual es crítico dentro del flujo, ya que ese pago es el que permite cerrar el ciclo del factoring. 
+
 - **Faltan estados de pago pendiente, impago y mora.** El flujo actual asume el camino feliz. Se debe contemplar:
   - `PENDING_PAYMENT`: la factura está fondeada y se espera el pago en la fecha de vencimiento.
   - `OVERDUE / IN_MORA`: pasó la fecha estimada y el pagador no ha pagado.
   - `DEFAULTED`: impago confirmado, se dispara el proceso de protesto/cobranza.
 
-
+Además, sería importante considerar un componente o proceso de cobranzas que gestione estos escenarios y haga seguimiento a los pagos de la Entidad B. 
 
 ### No se especifica claramente a quién se está pagando
 
@@ -309,6 +312,8 @@ El flujo correcto debería ser:
 3. Company B paga la factura a Entity C.
 4. Entity C paga a Investor D el capital invertido más la ganancia.
 ```
+Adicionalmente, se debería considerar que la plataforma informe a la Entidad B sobre la cesión de la factura, ya que este paso es importante dentro del proceso de negocio y no se encuentra representado en el diagrama. 
+Se observa también que no se representa explícitamente el momento en que la Entidad C notifica a la Entidad B sobre la cesión de la factura, lo cual es relevante desde el punto de vista operativo y legal dentro del proceso de factoring. 
 
 ---
 
@@ -326,6 +331,9 @@ Se debería contemplar un flujo para:
 - Protesto o recuperación
 ```
 
+Adicionalmente, no se evidencia un módulo o servicio encargado específicamente de gestionar la interacción con la Entidad B (deudor), tanto para el cobro como para el seguimiento del pago, lo cual es clave dentro del flujo completo del negocio.
+También se observa una posible inconsistencia entre la complejidad de la arquitectura propuesta (uso de microservicios, eventos, etc.) y la infraestructura estimada, ya que se menciona que sería suficiente un solo servidor, lo cual podría no ser coherente con ese nivel de diseño.
+Finalmente, no queda completamente claro cómo se gestiona el cálculo de la ganancia (porcentaje Y%) dentro del modelo de datos, específicamente cómo se diferencia la comisión de la plataforma respecto a la rentabilidad del inversionista.
 
 
 
