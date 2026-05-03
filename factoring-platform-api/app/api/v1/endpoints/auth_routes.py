@@ -1,3 +1,4 @@
+'''
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
@@ -30,3 +31,19 @@ def login_access_token(
         "token_type": "bearer",
         "user_role": user.role # Útil para el frontend (ej. 'investor' o 'company')
     }
+
+'''
+'''
+MOKERARLO POR SI LA BD FALLA
+'''
+@router.post("/login")
+def login_acceso_rapido(form_data: OAuth2PasswordRequestForm = Depends()):
+    # Bypass para que el PoC funcione sí o sí
+    if form_data.username == "demo@demo.com" and form_data.password == "1234":
+        access_token = create_access_token(subject="1") # 1 es un ID de usuario ficticio
+        return {"access_token": access_token, "token_type": "bearer"}
+    raise HTTPException(status_code=400, detail="Credenciales incorrectas")
+
+
+
+
