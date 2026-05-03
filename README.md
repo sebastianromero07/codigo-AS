@@ -262,7 +262,7 @@ Docker
 ```
 
 ## Observaciones de Arquitectura
-
+Está en el archivo AS 2.PDF
 
 
 
